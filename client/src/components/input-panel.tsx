@@ -90,10 +90,10 @@ export default function InputPanel({ onGenerate, isGenerating, setIsGenerating }
 
   return (
     <div className="lg:col-span-1">
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sticky top-24">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 sticky top-24">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-2">Create Your Blog Post</h2>
-          <p className="text-sm text-slate-600">Enter your topic and let AI generate engaging content for you.</p>
+          <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">Create Your Blog Post</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Enter your topic and let AI generate engaging content for you.</p>
         </div>
 
         <Form {...form}>
@@ -107,6 +107,7 @@ export default function InputPanel({ onGenerate, isGenerating, setIsGenerating }
                   <FormControl>
                     <Input 
                       placeholder="e.g., Benefits of Remote Work, AI in Healthcare..."
+                      className="text-slate-900 placeholder:text-slate-500"
                       {...field}
                     />
                   </FormControl>
@@ -124,6 +125,7 @@ export default function InputPanel({ onGenerate, isGenerating, setIsGenerating }
                   <FormControl>
                     <Input 
                       placeholder="productivity, technology, innovation"
+                      className="text-slate-900 placeholder:text-slate-500"
                       {...field}
                     />
                   </FormControl>
