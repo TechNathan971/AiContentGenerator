@@ -144,3 +144,83 @@ export async function generateTopicSuggestions(theme: string = ""): Promise<stri
     throw new Error("Failed to generate topic suggestions");
   }
 }
+
+export interface SocialMediaPost {
+  caption: string;
+  hashtags: string[];
+  platform: string;
+  engagement_tips: string[];
+}
+
+export async function generateSocialMediaPost(
+  imageBase64: string,
+  platform: string,
+  tone: string
+): Promise<SocialMediaPost> {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `Analyze this image and create a compelling social media post for ${platform}. 
+
+Platform: ${platform}
+Tone: ${tone}
+
+Please provide a response in JSON format:
+{
+  "caption": "Engaging caption text that matches the image content and platform style",
+  "hashtags": ["hashtag1", "hashtag2", "hashtag3", "hashtag4", "hashtag5"],
+  "platform": "${platform}",
+  "engagement_tips": ["tip1", "tip2", "tip3"]
+}
+
+Guidelines:
+- For TikTok: Use trendy, engaging language with emojis, focus on hooks and calls to action
+- For Facebook: More conversational, community-focused, tell a story
+- For Instagram: Visual-focused, aspirational, use relevant hashtags
+- For Twitter: Concise, witty, include relevant hashtags and mentions
+
+Caption requirements:
+- Match the ${tone} tone exactly
+- Be platform-appropriate length (TikTok: 150+ chars, Facebook: 80-100 words, Instagram: 125-150 words, Twitter: under 280 chars)
+- Include engaging hooks and calls to action
+- Reference what's actually visible in the image
+
+Hashtag requirements:
+- Include 5-8 relevant hashtags
+- Mix popular and niche hashtags
+- Ensure hashtags match image content and platform trends
+- No spaces in hashtags, use camelCase for multi-word tags
+
+Engagement tips:
+- Provide 3 specific tips for increasing engagement on this platform
+- Focus on actionable advice
+
+Respond only with valid JSON, no other text.`;
+
+    const imagePart = {
+      inlineData: {
+        data: imageBase64,
+        mimeType: "image/jpeg"
+      }
+    };
+
+    const result = await model.generateContent([prompt, imagePart]);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Clean up the response to ensure it's valid JSON
+    const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedResult = JSON.parse(cleanedText);
+    
+    return {
+      caption: parsedResult.caption || "Check out this amazing content!",
+      hashtags: parsedResult.hashtags || ["content", "amazing", "follow"],
+      platform: platform,
+      engagement_tips: parsedResult.engagement_tips || ["Post at peak times", "Engage with comments quickly", "Use trending hashtags"]
+    };
+
+  } catch (error) {
+    console.error("Google AI API Error for social media:", error);
+    throw new Error("Failed to generate social media post. Please check your image and try again.");
+  }
+}

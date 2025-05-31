@@ -2,7 +2,8 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { generateContentSchema } from "@shared/schema";
-import { generateBlogPost, generateTopicSuggestions } from "./openai";
+import { generateBlogPost, generateTopicSuggestions, generateSocialMediaPost } from "./openai";
+import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Generate blog post content
@@ -120,6 +121,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Delete blog post error:", error);
       res.status(500).json({ message: "Failed to delete blog post" });
+    }
+  });
+
+  // Generate social media post from image
+  const socialMediaSchema = z.object({
+    platform: z.enum(["tiktok", "facebook", "instagram", "twitter"]),
+    tone: z.enum(["casual", "professional", "playful", "inspirational"]),
+    includeHashtags: z.boolean().default(true),
+    imageBase64: z.string(),
+  });
+
+  app.post("/api/generate-social-post", async (req, res) => {
+    try {
+      const validatedData = socialMediaSchema.parse(req.body);
+      
+      const socialPost = await generateSocialMediaPost(
+        validatedData.imageBase64,
+        validatedData.platform,
+        validatedData.tone
+      );
+
+      res.json(socialPost);
+    } catch (error) {
+      console.error("Generate social media post error:", error);
+      res.status(400).json({ 
+        message: error instanceof Error ? error.message : "Failed to generate social media post" 
+      });
     }
   });
 
