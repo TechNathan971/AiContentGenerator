@@ -18,7 +18,7 @@ This AI-powered content creation tool is actively being built. Expect frequent u
 
 ## ✨ Features (Planned & In Progress)
 
-- 🧠 Gemini-based Content Generation (OpenAI)
+- 🧠 Gemini-based Content Generation
 - ✍️ Blog Posts, Emails, Product Descriptions, Social Media Captions
 - 🎨 Custom Tone & Style Selection
 - 📄 Markdown & HTML Output Options
