@@ -47,8 +47,18 @@ export class MemStorage implements IStorage {
   async createBlogPost(insertBlogPost: InsertBlogPost): Promise<BlogPost> {
     const id = this.currentBlogPostId++;
     const blogPost: BlogPost = {
-      ...insertBlogPost,
       id,
+      userId: null, // No user system for now
+      title: insertBlogPost.title,
+      content: insertBlogPost.content,
+      topic: insertBlogPost.topic,
+      keywords: insertBlogPost.keywords || null,
+      contentLength: insertBlogPost.contentLength,
+      writingTone: insertBlogPost.writingTone,
+      targetAudience: insertBlogPost.targetAudience,
+      wordCount: insertBlogPost.wordCount,
+      seoScore: insertBlogPost.seoScore || null,
+      featuredImageDescription: insertBlogPost.featuredImageDescription || null,
       createdAt: new Date(),
     };
     this.blogPosts.set(id, blogPost);

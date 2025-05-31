@@ -1,9 +1,6 @@
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_ENV_VAR || "default_key"
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY!);
 
 export interface GeneratedContent {
   title: string;
@@ -23,6 +20,8 @@ export async function generateBlogPost(
   targetAudience: string
 ): Promise<GeneratedContent> {
   try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
     const wordTargets = {
       short: "300-500",
       medium: "500-800",
@@ -54,45 +53,36 @@ Requirements:
 - Make content engaging and informative
 - Ensure content is original and valuable
 - Include a compelling introduction and conclusion
-- Add relevant examples or case studies if applicable`;
+- Add relevant examples or case studies if applicable
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are an expert content writer and SEO specialist. Create high-quality, engaging blog posts that are optimized for search engines and provide real value to readers."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
-      max_tokens: 3000
-    });
+Respond only with valid JSON, no other text.`;
 
-    const result = JSON.parse(response.choices[0].message.content || "{}");
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Clean up the response to ensure it's valid JSON
+    const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedResult = JSON.parse(cleanedText);
     
     // Calculate reading time (average 200 words per minute)
-    const readingTime = Math.ceil(result.wordCount / 200);
+    const readingTime = Math.ceil(parsedResult.wordCount / 200);
     
     // Calculate SEO score based on various factors
-    const seoScore = calculateSeoScore(result.title, result.content, keywords);
+    const seoScore = calculateSeoScore(parsedResult.title, parsedResult.content, keywords);
 
     return {
-      title: result.title || "Generated Blog Post",
-      content: result.content || "",
-      featuredImageDescription: result.featuredImageDescription || "Professional blog post illustration",
+      title: parsedResult.title || "Generated Blog Post",
+      content: parsedResult.content || "",
+      featuredImageDescription: parsedResult.featuredImageDescription || "Professional blog post illustration",
       seoScore,
-      wordCount: result.wordCount || 0,
+      wordCount: parsedResult.wordCount || 0,
       readingTime,
-      seoSuggestions: result.seoSuggestions || []
+      seoSuggestions: parsedResult.seoSuggestions || []
     };
 
   } catch (error) {
-    console.error("OpenAI API Error:", error);
+    console.error("Google AI API Error:", error);
     throw new Error("Failed to generate content. Please check your API key and try again.");
   }
 }
@@ -123,6 +113,8 @@ function calculateSeoScore(title: string, content: string, keywords: string): nu
 
 export async function generateTopicSuggestions(theme: string = ""): Promise<string[]> {
   try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
     const prompt = `Generate 10 engaging blog post topic suggestions${theme ? ` related to: ${theme}` : " for various industries and interests"}. 
     
     Please provide a response in JSON format:
@@ -134,27 +126,18 @@ export async function generateTopicSuggestions(theme: string = ""): Promise<stri
     - Specific and actionable
     - SEO-friendly
     - Engaging for readers
-    - Relevant to current trends`;
+    - Relevant to current trends
+    
+    Respond only with valid JSON, no other text.`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: "You are a content marketing expert who creates compelling blog post topics that drive engagement and traffic."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.8,
-      max_tokens: 500
-    });
-
-    const result = JSON.parse(response.choices[0].message.content || "{}");
-    return result.topics || [];
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    // Clean up the response to ensure it's valid JSON
+    const cleanedText = text.replace(/```json\n?|\n?```/g, '').trim();
+    const parsedResult = JSON.parse(cleanedText);
+    return parsedResult.topics || [];
 
   } catch (error) {
     console.error("Error generating topic suggestions:", error);

@@ -31,7 +31,6 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export const insertBlogPostSchema = createInsertSchema(blogPosts).omit({
   id: true,
-  userId: true,
   createdAt: true,
 });
 

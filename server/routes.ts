@@ -20,7 +20,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Save to storage
       const blogPost = await storage.createBlogPost({
-        userId: null, // No user system for now
         title: generatedContent.title,
         content: generatedContent.content,
         topic: validatedData.topic,
