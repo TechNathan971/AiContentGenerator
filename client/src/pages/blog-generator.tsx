@@ -48,7 +48,7 @@ export default function BlogGenerator() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
               <div className="w-6 h-6 bg-gradient-to-br from-primary-600 to-accent-600 rounded"></div>
-              <span className="text-slate-600 text-sm">© 2024 AI Blog Generator. Powered by OpenAI.</span>
+              <span className="text-slate-600 text-sm">© 2024 AI Blog Generator. Powered by Google Gemini.</span>
             </div>
             <div className="flex items-center space-x-6 text-sm text-slate-600">
               <a href="#" className="hover:text-slate-900">Privacy Policy</a>

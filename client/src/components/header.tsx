@@ -9,7 +9,7 @@ export default function Header() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-900">AI Blog Generator</h1>
-              <p className="text-xs text-slate-500">Powered by GPT-4</p>
+              <p className="text-xs text-slate-500">Powered by Google Gemini</p>
             </div>
           </div>
           <nav className="hidden md:flex items-center space-x-6">
